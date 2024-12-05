@@ -1,0 +1,14 @@
+﻿@{
+    ViewBag.Title = "Image";
+}
+
+<h2>Generated Image</h2>
+
+@if (ViewBag.ImageDataUrl != null)
+{
+    <img src="@ViewBag.ImageDataUrl" alt="Generated Image" />
+}
+else
+{
+    <p>@ViewBag.ErrorMessage</p>
+}
