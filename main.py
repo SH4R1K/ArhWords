@@ -1,13 +1,5 @@
-#!/usr/bin/env python
-"""
-Word Cloud with Custom Shape and Stop Words from NLTK
-========================================================
-
-Generating a word cloud from the US constitution using a custom shape and stop words from NLTK.
-"""
 import os
 from os import path
-
 import flask
 from wordcloud import WordCloud, STOPWORDS
 import matplotlib.pyplot as plt
@@ -32,7 +24,13 @@ def wordCloud():
         return {"error": "no text found in request"}, 400
 
     text = data['text']
+    min_font_size = data.get('min_font_size', 4)
+    max_font_size = data.get('max_font_size', None)
+    max_words = data.get('max_words', 100)
+    theme = data.get('theme', "black")
 
+    if theme not in ["black", "white"]:
+        return {"error": "theme must be 'black' or 'white'"}, 400
 
     # get data directory
     d = path.dirname(__file__) if "__file__" in locals() else os.getcwd()
@@ -52,8 +50,15 @@ def wordCloud():
 
     try:
         # Generate a word cloud image with the mask and stop words
-        wordcloud = WordCloud(mask=mask_image, contour_color='black', contour_width=1,
-                              stopwords=custom_stopwords, max_words=100).generate(text)
+        wordcloud = WordCloud(
+            mask=mask_image,
+            contour_color=theme,
+            contour_width=1,
+            stopwords=custom_stopwords,
+            max_words=max_words,
+            min_font_size=min_font_size,
+            max_font_size=max_font_size,
+        ).generate(text)
     except Exception as e:
         return {"error": f"Error generating word cloud: {str(e)}"}, 500
 
