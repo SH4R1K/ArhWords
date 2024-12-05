@@ -1,9 +1,6 @@
 import os
 from os import path
-import flask
-from scipy.special import parameters
 from wordcloud import WordCloud, STOPWORDS
-import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 import nltk
@@ -14,6 +11,13 @@ from flask import Flask, send_file, request
 import io
 
 app = Flask(__name__)
+
+AVAILABLE_COLORMAPS = [
+    "Wisteria", "Reds", "afmhot", "Purples", "RdPu",
+    "gnuplot", "PRGn", "Greens", "Blues", "RdBu",
+    "Greys", "cool", "Dark2", "brg", "winter",
+    "spring", "plasma", "magma", "hot"
+]
 
 # Функция для предварительной обработки текста
 def preprocess_text(text):
@@ -32,11 +36,23 @@ def wordCloud():
 
     if not data or 'text' not in data:
         return {"error": "no text found in request"}, 400
-    
+
+    # parameters for wordCloud
+    min_font_size = data.get('min_font_size', 4)
+    max_font_size = data.get('max_font_size', None)
+    max_words = data.get('max_words', 100)
+    theme = data.get('theme', "black")
+    colormap = data.get('colormap', None)
+
+    if colormap not in AVAILABLE_COLORMAPS and colormap is not None:
+        return {"error": f"Invalid colormap. Choose one of {AVAILABLE_COLORMAPS}"}, 400
+
+    if theme not in ["black", "white"]:
+        return {"error": "theme must be 'black' or 'white'"}, 400
+
     # Чтение текста
     text = data['text']
-    
-    
+
     text = preprocess_text(text)  # Предварительная обработка текста
     # Получение стоп-слов на русском языке
     russian_stopwords = set(stopwords.words('russian'))
@@ -54,14 +70,6 @@ def wordCloud():
     # Получение весов слов и словосочетаний
     weights = dict(zip(feature_names, tfidf_matrix.toarray()[0]))   
 
-    # parameters for wordCloud
-    min_font_size = data.get('min_font_size', 4)
-    max_font_size = data.get('max_font_size', None)
-    max_words = data.get('max_words', 100)
-    theme = data.get('theme', "black")
-
-    if theme not in ["black", "white"]:
-        return {"error": "theme must be 'black' or 'white'"}, 400
 
     # get data directory
     d = path.dirname(__file__) if "__file__" in locals() else os.getcwd()
@@ -82,6 +90,7 @@ def wordCloud():
             min_font_size=min_font_size,
             max_font_size=max_font_size,
             relative_scaling=0,
+            colormap=colormap,
         ).generate_from_frequencies(weights) 
     except Exception as e:
         return {"error": f"Error generating word cloud: {str(e)}"}, 500
