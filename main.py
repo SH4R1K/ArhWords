@@ -1,6 +1,7 @@
 import os
 from os import path
 import flask
+from scipy.special import parameters
 from wordcloud import WordCloud, STOPWORDS
 import matplotlib.pyplot as plt
 import numpy as np
@@ -53,7 +54,7 @@ def wordCloud():
     # Получение весов слов и словосочетаний
     weights = dict(zip(feature_names, tfidf_matrix.toarray()[0]))   
 
-    
+    # parameters for wordCloud
     min_font_size = data.get('min_font_size', 4)
     max_font_size = data.get('max_font_size', None)
     max_words = data.get('max_words', 100)
