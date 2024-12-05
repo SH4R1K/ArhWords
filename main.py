@@ -1,10 +1,3 @@
-#!/usr/bin/env python
-"""
-Word Cloud with Custom Shape and TF-IDF Weights (Including N-grams)
-========================================================
-
-Generating a word cloud from the US constitution using a custom shape and TF-IDF weights, including n-grams.
-"""
 import os
 from os import path
 import flask
@@ -31,8 +24,8 @@ def preprocess_text(text):
 
 @app.route('/wordCloud', methods=['POST'])
 def wordCloud():
-    # Загрузка стоп-слов NLTK (это можно сделать один раз при запуске приложения)
-    nltk.download('stopwords', quiet=True)
+    # Загрузка стоп-слов NLTK
+    nltk.download('stopwords')
 
     data = request.get_json()
 
@@ -41,8 +34,9 @@ def wordCloud():
     
     # Чтение текста
     text = data['text']
+    
+    
     text = preprocess_text(text)  # Предварительная обработка текста
-
     # Получение стоп-слов на русском языке
     russian_stopwords = set(stopwords.words('russian'))
     # Определение пользовательских стоп-слов
@@ -59,6 +53,15 @@ def wordCloud():
     # Получение весов слов и словосочетаний
     weights = dict(zip(feature_names, tfidf_matrix.toarray()[0]))   
 
+    
+    min_font_size = data.get('min_font_size', 4)
+    max_font_size = data.get('max_font_size', None)
+    max_words = data.get('max_words', 100)
+    theme = data.get('theme', "black")
+
+    if theme not in ["black", "white"]:
+        return {"error": "theme must be 'black' or 'white'"}, 400
+
     # get data directory
     d = path.dirname(__file__) if "__file__" in locals() else os.getcwd()
 
@@ -67,17 +70,23 @@ def wordCloud():
     except Exception as e:
         return {"error": f"Error loading mask image: {str(e)}"}, 500
 
-    # Генерация облака слов с учетом весов
-    wordcloud = WordCloud(mask=mask_image, contour_color='black', contour_width=1,
-                        max_words=100, relative_scaling=0, normalize_plurals=False,
-                        colormap='viridis').generate_from_frequencies(weights)  # Использование цветовой схемы
+    try:
+        # Generate a word cloud image with the mask and stop words
+        wordcloud = WordCloud(
+            mask=mask_image,
+            contour_color=theme,
+            contour_width=1,
+            stopwords=custom_stopwords,
+            max_words=max_words,
+            min_font_size=min_font_size,
+            max_font_size=max_font_size,
+            relative_scaling=0,
+        ).generate_from_frequencies(weights) 
+    except Exception as e:
+        return {"error": f"Error generating word cloud: {str(e)}"}, 500
 
-    # Сохранение изображения облака слов в файл
-    output_file = path.join(d, 'wordcloud_shape.png')
-    wordcloud.to_file(output_file)
+    img = wordcloud.to_image()
 
-    print(f"Облако слов сохранено в файл: {output_file}")
-    
     # Создание изображения для отправки
     img_io = io.BytesIO()
     wordcloud.to_image().save(img_io, format='PNG')
