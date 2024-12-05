@@ -27,7 +27,6 @@ def preprocess_text(text):
     # Удаление пунктуации
     text = text.translate(str.maketrans('', '', string.punctuation))
     text = text.translate(str.maketrans('', '', string.ascii_letters))
-    text = text.translate(str.maketrans('', '', string.ascii_letters))
     return text
 
 @app.route('/wordCloud', methods=['POST'])
