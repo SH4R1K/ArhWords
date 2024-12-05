@@ -8,6 +8,7 @@ from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 import string
 from flask import Flask, send_file, request
+import text_module as tm
 import io
 
 app = Flask(__name__)
@@ -25,6 +26,7 @@ def preprocess_text(text):
     text = text.lower()
     # Удаление пунктуации
     text = text.translate(str.maketrans('', '', string.punctuation))
+    text = text.translate(str.maketrans('', '', string.ascii_letters))
     text = text.translate(str.maketrans('', '', string.ascii_letters))
     return text
 
@@ -53,7 +55,9 @@ def wordCloud():
 
     # Чтение текста
     text = data['text']
-
+    slovosochetaniya = " ".join(tm.get_slovosochetaniya(text))
+    normal_text = tm.get_text_in_normal_form(text)
+    text = slovosochetaniya + f" {normal_text}"
     text = preprocess_text(text)  # Предварительная обработка текста
     # Получение стоп-слов на русском языке
     russian_stopwords = set(stopwords.words('russian'))
