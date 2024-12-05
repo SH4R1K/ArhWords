@@ -83,7 +83,7 @@ def wordCloud():
         # Generate a word cloud image with the mask and stop words
         wordcloud = WordCloud(
             mask=mask_image,
-            contour_color=theme,
+            background_color=theme,
             contour_width=1,
             stopwords=custom_stopwords,
             max_words=max_words,
@@ -91,6 +91,7 @@ def wordCloud():
             max_font_size=max_font_size,
             relative_scaling=0,
             colormap=colormap,
+            contour_color= "white" if theme == "white" else "black",
         ).generate_from_frequencies(weights) 
     except Exception as e:
         return {"error": f"Error generating word cloud: {str(e)}"}, 500
