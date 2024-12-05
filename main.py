@@ -1,11 +1,11 @@
 import os
 from os import path
-import flask
 from wordcloud import WordCloud, STOPWORDS
 import numpy as np
 from PIL import Image
 import nltk
 from flask import Flask, send_file, request
+import text_module as tm
 import io
 import requests  # Импортируем библиотеку requests
 
@@ -13,6 +13,21 @@ app = Flask(__name__)
 
 # URL для обращения к GigaChat API
 GIGACHAT_API_URL = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
+AVAILABLE_COLORMAPS = [
+    "Wisteria", "Reds", "afmhot", "Purples", "RdPu",
+    "gnuplot", "PRGn", "Greens", "Blues", "RdBu",
+    "Greys", "cool", "Dark2", "brg", "winter",
+    "spring", "plasma", "magma", "hot"
+]
+
+# Функция для предварительной обработки текста
+def preprocess_text(text):
+    # Приведение к нижнему регистру
+    text = text.lower()
+    # Удаление пунктуации
+    text = text.translate(str.maketrans('', '', string.punctuation))
+    text = text.translate(str.maketrans('', '', string.ascii_letters))
+    return text
 @app.route('/wordCloud', methods=['POST'])
 def wordCloud():
     # Загрузка стоп-слов NLTK
@@ -22,11 +37,24 @@ def wordCloud():
 
     if not data or 'text' not in data:
         return {"error": "no text found in request"}, 400
-    
+
+    # parameters for wordCloud
+    min_font_size = data.get('min_font_size', 4)
+    max_font_size = data.get('max_font_size', None)
+    max_words = data.get('max_words', 100)
+    theme = data.get('theme', "black")
+    colormap = data.get('colormap', None)
+
+    if colormap not in AVAILABLE_COLORMAPS and colormap is not None:
+        return {"error": f"Invalid colormap. Choose one of {AVAILABLE_COLORMAPS}"}, 400
+
+    if theme not in ["black", "white"]:
+        return {"error": "theme must be 'black' or 'white'"}, 400
+
     # Чтение текста
     text = data['text']
-    print(f"Received text: {text}")  # Логируем полученный текст
 
+    text = preprocess_text(text)
     # Получение ключевых слов и весов с помощью GigaChat API
     keywords_with_weights = get_keywords(text)
     
@@ -48,14 +76,27 @@ def wordCloud():
     # Проверка, если weights пуст
     if not weights:
         return {"error": "No valid keywords found"}, 500
+      
+#     slovosochetaniya = " ".join(tm.get_slovosochetaniya(text))
+#     normal_text = tm.get_text_in_normal_form(text)
+#     text = slovosochetaniya + f" {normal_text}"
+#     text = preprocess_text(text)  # Предварительная обработка текста
+#     # Получение стоп-слов на русском языке
+#     russian_stopwords = set(stopwords.words('russian'))
+#     # Определение пользовательских стоп-слов
+#     custom_stopwords = set(STOPWORDS).union(russian_stopwords)
 
-    min_font_size = data.get('min_font_size', 4)
-    max_font_size = data.get('max_font_size', None)
-    max_words = data.get('max_words', 100)
-    theme = data.get('theme', "black")
+#     # Преобразование пользовательских стоп-слов в список
+#     custom_stopwords_list = list(custom_stopwords)
 
-    if theme not in ["black", "white"]:
-        return {"error": "theme must be 'black' or 'white'"}, 400
+#     # Применение TF-IDF с учетом биграмм
+#     vectorizer = TfidfVectorizer(stop_words=custom_stopwords_list, ngram_range=(1, 2))
+#     tfidf_matrix = vectorizer.fit_transform([text])
+#     feature_names = vectorizer.get_feature_names_out()
+
+#     # Получение весов слов и словосочетаний
+#     weights = dict(zip(feature_names, tfidf_matrix.toarray()[0]))   
+
 
     # Получение директории данных
     d = path.dirname(__file__) if "__file__" in locals() else os.getcwd()
@@ -69,14 +110,16 @@ def wordCloud():
         # Генерация изображения облака слов с маской и стоп-словами
         wordcloud = WordCloud(
             mask=mask_image,
-            contour_color=theme,
+            background_color=theme,
             contour_width=1,
             stopwords=STOPWORDS,
             max_words=max_words,
             min_font_size=min_font_size,
             max_font_size=max_font_size,
             relative_scaling=0,
-        ).generate_from_frequencies(weights)
+            colormap=colormap,
+            contour_color= "white" if theme == "white" else "black",
+        ).generate_from_frequencies(weights) 
     except Exception as e:
         return {"error": f"Error generating word cloud: {str(e)}"}, 500
 
@@ -112,9 +155,8 @@ def get_keywords(text):
         response = requests.post(GIGACHAT_API_URL, headers=headers, json=payload, verify='russian_trusted_root_ca.cer')
         response.raise_for_status()  # Проверяем на ошибки HTTP
         
-        # Логируем текст запроса и ответа
-        print("Request payload:", payload)
-        print("Response text:", response.text)  # Логируем текст ответа
+        # Логируем текст ответа
+        print("Response text:", response.text)  
         
         keywords_data = response.json()
         print(keywords_data)  # Для отладки
