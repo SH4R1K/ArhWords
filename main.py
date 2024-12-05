@@ -20,14 +20,29 @@ AVAILABLE_COLORMAPS = [
     "spring", "plasma", "magma", "hot"
 ]
 
+# Чтение списка матерных слов из файла
+def load_bad_words(file_path):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        bad_words = file.read().splitlines()
+    return bad_words
+
 # Функция для предварительной обработки текста
 def preprocess_text(text):
+    bad_words = load_bad_words('bad_words.txt')
+
     # Приведение к нижнему регистру
     text = text.lower()
     # Удаление пунктуации
     text = text.translate(str.maketrans('', '', string.punctuation))
     text = text.translate(str.maketrans('', '', string.ascii_letters))
+
+    words = text.split()
+    words = [word for word in words if word not in bad_words]
+    return ' '.join(words)
+
     return text
+  
+  
 @app.route('/wordCloud', methods=['POST'])
 def wordCloud():
     # Загрузка стоп-слов NLTK
