@@ -4,15 +4,15 @@ from wordcloud import WordCloud, STOPWORDS
 import numpy as np
 from PIL import Image
 import nltk
-from nltk.corpus import stopwords
-from sklearn.feature_extraction.text import TfidfVectorizer
-import string
 from flask import Flask, send_file, request
 import text_module as tm
 import io
+import requests  # Импортируем библиотеку requests
 
 app = Flask(__name__)
 
+# URL для обращения к GigaChat API
+GIGACHAT_API_URL = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
 AVAILABLE_COLORMAPS = [
     "Wisteria", "Reds", "afmhot", "Purples", "RdPu",
     "gnuplot", "PRGn", "Greens", "Blues", "RdBu",
@@ -28,11 +28,10 @@ def preprocess_text(text):
     text = text.translate(str.maketrans('', '', string.punctuation))
     text = text.translate(str.maketrans('', '', string.ascii_letters))
     return text
-
 @app.route('/wordCloud', methods=['POST'])
 def wordCloud():
     # Загрузка стоп-слов NLTK
-    nltk.download('stopwords')
+    nltk.download('stopwords', quiet=True)
 
     data = request.get_json()
 
@@ -54,28 +53,52 @@ def wordCloud():
 
     # Чтение текста
     text = data['text']
-    slovosochetaniya = " ".join(tm.get_slovosochetaniya(text))
-    normal_text = tm.get_text_in_normal_form(text)
-    text = slovosochetaniya + f" {normal_text}"
-    text = preprocess_text(text)  # Предварительная обработка текста
-    # Получение стоп-слов на русском языке
-    russian_stopwords = set(stopwords.words('russian'))
-    # Определение пользовательских стоп-слов
-    custom_stopwords = set(STOPWORDS).union(russian_stopwords)
 
-    # Преобразование пользовательских стоп-слов в список
-    custom_stopwords_list = list(custom_stopwords)
+    text = preprocess_text(text)
+    # Получение ключевых слов и весов с помощью GigaChat API
+    keywords_with_weights = get_keywords(text)
+    
+    # Проверка, если keywords_with_weights пуст
+    if not keywords_with_weights:
+        return {"error": "No keywords returned from API"}, 500
 
-    # Применение TF-IDF с учетом биграмм
-    vectorizer = TfidfVectorizer(stop_words=custom_stopwords_list, ngram_range=(1, 2))
-    tfidf_matrix = vectorizer.fit_transform([text])
-    feature_names = vectorizer.get_feature_names_out()
+    # Преобразование результата в словарь
+    weights = {}
+    for line in keywords_with_weights.splitlines():
+        line = line.strip()
+        if ':' in line:
+            try:
+                word, weight = line.split(':', 1)
+                weights[word.strip()] = float(weight.strip())
+            except ValueError:
+                continue  # Игнорируем строки с неправильным форматом
 
-    # Получение весов слов и словосочетаний
-    weights = dict(zip(feature_names, tfidf_matrix.toarray()[0]))   
+    # Проверка, если weights пуст
+    if not weights:
+        return {"error": "No valid keywords found"}, 500
+      
+#     slovosochetaniya = " ".join(tm.get_slovosochetaniya(text))
+#     normal_text = tm.get_text_in_normal_form(text)
+#     text = slovosochetaniya + f" {normal_text}"
+#     text = preprocess_text(text)  # Предварительная обработка текста
+#     # Получение стоп-слов на русском языке
+#     russian_stopwords = set(stopwords.words('russian'))
+#     # Определение пользовательских стоп-слов
+#     custom_stopwords = set(STOPWORDS).union(russian_stopwords)
+
+#     # Преобразование пользовательских стоп-слов в список
+#     custom_stopwords_list = list(custom_stopwords)
+
+#     # Применение TF-IDF с учетом биграмм
+#     vectorizer = TfidfVectorizer(stop_words=custom_stopwords_list, ngram_range=(1, 2))
+#     tfidf_matrix = vectorizer.fit_transform([text])
+#     feature_names = vectorizer.get_feature_names_out()
+
+#     # Получение весов слов и словосочетаний
+#     weights = dict(zip(feature_names, tfidf_matrix.toarray()[0]))   
 
 
-    # get data directory
+    # Получение директории данных
     d = path.dirname(__file__) if "__file__" in locals() else os.getcwd()
 
     try:
@@ -84,12 +107,12 @@ def wordCloud():
         return {"error": f"Error loading mask image: {str(e)}"}, 500
 
     try:
-        # Generate a word cloud image with the mask and stop words
+        # Генерация изображения облака слов с маской и стоп-словами
         wordcloud = WordCloud(
             mask=mask_image,
             background_color=theme,
             contour_width=1,
-            stopwords=custom_stopwords,
+            stopwords=STOPWORDS,
             max_words=max_words,
             min_font_size=min_font_size,
             max_font_size=max_font_size,
@@ -100,14 +123,58 @@ def wordCloud():
     except Exception as e:
         return {"error": f"Error generating word cloud: {str(e)}"}, 500
 
-    img = wordcloud.to_image()
-
-    # Создание изображения для отправки
     img_io = io.BytesIO()
     wordcloud.to_image().save(img_io, format='PNG')
     img_io.seek(0)
 
     return send_file(img_io, mimetype='image/png')
+
+def get_keywords(text):
+    headers = {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer key'  # Замените на ваш токен
+    }
+    
+    payload = {
+        "model": "GigaChat",
+        "messages": [
+            {
+                "role": "system",
+                "content": "Ты лингвист и эксперт в области туризма."
+            },
+            {
+                "role": "user",
+                "content": f"Пожалуйста, выпиши ключевые слова и словосочетания, связанные с темой 'Новогодний туризм в Архангельской области'. Формат: слово(словосочетание):вес из вот этого текста: {text}."
+            }
+        ],
+        "stream": False,
+        "update_interval": 0
+    }
+
+    try:
+        response = requests.post(GIGACHAT_API_URL, headers=headers, json=payload, verify='russian_trusted_root_ca.cer')
+        response.raise_for_status()  # Проверяем на ошибки HTTP
+        
+        # Логируем текст ответа
+        print("Response text:", response.text)  
+        
+        keywords_data = response.json()
+        print(keywords_data)  # Для отладки
+        
+        # Проверяем, есть ли ключевые слова в ответе
+        if 'choices' in keywords_data and len(keywords_data['choices']) > 0:
+            keywords = keywords_data['choices'][0]['message']['content'].split(', ')
+            # Присваиваем каждому слову вес 1.0
+            return '\n'.join([f"{keyword}:1.0" for keyword in keywords])  # Форматируем в нужный вид
+        else:
+            print("No 'choices' field in the response.")
+            return ""
+    except requests.exceptions.HTTPError as http_err:
+        print(f"HTTP error occurred: {http_err}")
+        return ""
+    except Exception as err:
+        print(f"An error occurred: {err}")
+        return ""
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000)
