@@ -2,7 +2,6 @@ import os
 import string
 from os import path
 
-from matplotlib.pyplot import contour
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from wordcloud import WordCloud, STOPWORDS
@@ -214,17 +213,19 @@ def wordCloud():
     max_font_size = data.get('max_font_size', None)
     max_words = data.get('max_words', 100)
     theme = data.get('theme', "black")
+    contour = data.get('contour', False)
     colormap = data.get('colormap', None)
     font_family = data.get('font_family', None)
+    mask_type = data.get('mask_type', 'mask_type1')
 
     if colormap not in AVAILABLE_COLORMAPS and colormap is not None:
         return {"error": f"Invalid colormap. Choose one of {AVAILABLE_COLORMAPS}"}, 400
 
-    if font_family not in AVAILABLE_FONTS and font_family is not None:
-        return {"error": f"Invalid font_family. Choose one of {AVAILABLE_FONTS}"}, 400
-
     if theme not in ["black", "white"]:
         return {"error": "theme must be 'black' or 'white'"}, 400
+
+    if mask_type not in AVAILABLE_MASKS and mask_type is not None:
+        return {"error": f"Invalid mask_type. Choose one of {AVAILABLE_MASKS}"}, 400
 
     # Чтение текста
     text = data['text']
@@ -249,9 +250,14 @@ def wordCloud():
     d = path.dirname(__file__) if "__file__" in locals() else os.getcwd()
 
     try:
-        mask_image = np.array(Image.open(path.join(d, 'mask_type1.png')))
+        mask_image = np.array(Image.open(path.join(d, "./masks/" + mask_type + ".png")))
     except Exception as e:
         return {"error": f"Error loading mask image: {str(e)}"}, 500
+
+    if contour:
+        contour_color = "black" if theme == "white" else "white"
+    else:
+        contour_color = theme
 
     try:
         # Генерация изображения облака слов с маской и стоп-словами
@@ -266,7 +272,7 @@ def wordCloud():
             max_font_size=max_font_size,
             relative_scaling=0,
             colormap=colormap,
-            contour_color="white" if theme == "white" else "black",
+            contour_color=contour_color,
         ).generate_from_frequencies(weights)
     except Exception as e:
         return {"error": f"Error generating word cloud: {str(e)}"}, 500
