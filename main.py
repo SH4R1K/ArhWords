@@ -12,6 +12,7 @@ from flask import Flask, send_file, request
 import text_module as tm
 import io
 import requests  # Импортируем библиотеку requests
+from receiving_token import get_access_token
 
 app = Flask(__name__)
 
@@ -126,9 +127,10 @@ def wordCloudGpt():
 
 
 def get_keywords(text):
+    access_token = get_access_token()
     headers = {
         'Accept': 'application/json',
-        'Authorization': 'Bearer key'  # Замените на ваш токен
+        'Authorization': f'Bearer {access_token}'  # Замените на ваш токен
     }
 
     payload = {
@@ -140,7 +142,7 @@ def get_keywords(text):
             },
             {
                 "role": "user",
-                "content": f"Пожалуйста, выпиши ключевые слова и словосочетания, связанные с темой 'Новогодний туризм в Архангельской области'. Формат: слово(словосочетание):вес из вот этого текста: {text}."
+                "content": f"Выдели около 200 ключевых слов на тему 'Новогоднее путешествие в архангельскую область', наиболее важные слова можешь продублировать несколько раз. Тебе необходимо выдать мне все эти слова через запятую. Используй следующий текст: {text}"
             }
         ],
         "stream": False,
