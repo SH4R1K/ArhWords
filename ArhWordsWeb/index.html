@@ -97,6 +97,19 @@
                             Контур
                             <input type="checkbox" id="contour"/>
                             <label for="contour">Toggle</label>
+                            Тип маски
+                            <div class="radio-group">
+                                <input type="radio" name="mask" value="mask_type1" />
+                                <img src="icons/masks/mask_type1.png" alt="Маска 1" />
+                                Маска 1
+                                <input type="radio" name="mask" value="mask_type2" />
+                                <img src="icons/masks/mask_type2.png" alt="Маска 2" />
+                                Маска 2
+                                <input type="radio" name="mask" value="mask_type3" />
+                                <img src="icons/masks/mask_type3.png" alt="Маска 3" />
+                                Маска 3
+                            </div>
+                            
                         </td>
                     </tr>
                 </table>
@@ -110,6 +123,7 @@
     </div>
 </div>
   <script>
+
         // Обработчик для кнопки создания облака слов
         document.getElementById("createButton").addEventListener("click", function () {
             var text = document.getElementById("inputText").value;
@@ -120,6 +134,7 @@
             var font = document.getElementById("fontSelect").value;
             var wordCount = document.getElementById("wordCount").value;
             var contour = document.getElementById("contour").checked;
+            var mask = document.querySelector('input[name="mask"]:checked').value;
 
             var params = {
                 text: text,
@@ -129,7 +144,8 @@
                 colormap: colorScheme,
                 font_family: font,
                 max_words: Number(wordCount),
-                contour: contour // Преобразуйте checkbox в булевое значениеontour: contour === "true" // Преобразуйте checkbox в булевое значениеontour: contour === "true" // Преобразуйте checkbox в булевое значение
+                contour: contour, // Преобразуйте checkbox в булевое значениеontour: contour === "true" // Преобразуйте checkbox в булевое значениеontour: contour === "true" // Преобразуйте checkbox в булевое значение
+                mask_type: mask
             };
         
             console.log(params);
