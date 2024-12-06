@@ -272,7 +272,7 @@ def wordCloud():
             max_font_size=max_font_size,
             relative_scaling=0,
             colormap=colormap,
-            contour_color="white" if theme == "white" else "black",
+            contour_color=contour_color,
         ).generate_from_frequencies(weights)
     except Exception as e:
         return {"error": f"Error generating word cloud: {str(e)}"}, 500
