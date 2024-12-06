@@ -1,0 +1,128 @@
+body {
+    margin: 0;
+    font-family: 'Advent Pro', sans-serif;
+    background-color: #f7f7f7;
+}
+
+.site {
+    display: flex;
+    height: 100vh;
+}
+
+.toolbar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    height: 100%;
+    width: 6%;
+}
+
+.toolbar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.toolbar-text {
+    font-size: 14px;
+    text-align: center;
+    margin-top: 5px;
+}
+
+.image-icon {
+    width: 24px;
+    height: 24px;
+    margin-left: 5px;
+}
+
+.content {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+header {
+    margin-left: 10px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.textbox-container {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.textbox {
+    margin-right: 20px;
+    width: 50%;
+}
+
+#inputText {
+    width: 100%;
+    height: 400px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 16px;
+    resize: none;
+    outline: none;
+}
+
+#createButton {
+    background: linear-gradient(0deg, rgba(233, 68, 46, 0.65), rgba(233, 68, 46, 0.65)), #641D89;
+    box-shadow: 0px 4px 6.7px rgba(0, 0, 0, 0.67);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 24px;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin: 20px 0;
+    transition: background 0.3s;
+    width: 100%;
+}
+
+#createButton:hover {
+    background: linear-gradient(0deg, rgba(233, 68, 46, 0.85), rgba(233, 68, 46, 0.85));
+}
+
+.image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    width: 50%;
+}
+
+.image-icon4 {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.image-placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    border: 2px dashed #e0e0e0;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.placeholder {
+    font-size: 18px;
+    color: #999;
+    text-align: center;
+    padding: 20px;
+}

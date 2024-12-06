@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, width=device-width">
+    <link rel="stylesheet" href="./index.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Advent+Pro:wght@400;600;900&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" />
+    <title>Создание облака слов</title>
+</head>
+<body>
+    <div class="site">
+        <div class="toolbar">
+            <div class="toolbar-item">
+                <img alt="Размер шрифта" class="image-icon" height="24" src="icons/image1.svg" width="24"/>
+                <span class="toolbar-text">
+                    Размер шрифта
+                </span>
+            </div>
+            <div class="toolbar-item">
+                <img alt="Цвет фона" class="image-icon" height="24" src="icons/Color.svg" width="24"/>
+                <span class="toolbar-text">
+                    Тема
+                </span>
+            </div>
+            <div class="toolbar-item">
+                <img alt="Цвет шрифта" class="image-icon" height="24" src="icons/image.svg" width="24"/>
+                <span class="toolbar-text">
+                    Цветовая схема
+                </span>
+            </div>
+        </div>
+        <div class="content">
+            <header>
+                <h1>
+                    Создание облака
+                </h1>
+            </header>
+            <div class="textbox-container">
+                <div class="textbox">
+                    <textarea id="inputText" placeholder="Введите текст..." rows="15"></textarea>
+                    <button id="createButton">
+                        Создать
+                    </button>
+                </div>
+                <div class="image-container">
+                    <img alt="Облако слов" class="image-icon4" height="400" id="wordCloudImage" src="icons/bird.png" width="400"/>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("createButton").addEventListener("click", function () {
+            var text = document.getElementById("inputText").value;
+
+            var params = {
+                text: text
+            };
+
+            fetch('http://127.0.0.1:3000/wordCloud', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(params)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.blob(); // Измените на blob для получения изображения
+            })
+            .then(blob => {
+                const url = URL.createObjectURL(blob); // Создайте URL для blob
+                document.getElementById("wordCloudImage").src = url; // Установите src на URL
+                document.getElementById("wordCloudImage").style.display = "block"; // Покажите изображение
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
