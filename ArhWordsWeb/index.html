@@ -25,11 +25,17 @@
                 <table>
                     <tr>
                         <td>
-                            <label for="wordCount">Количество слов<br>До:</label>
+                            Количество слов<br>До:
+                        </td>
+                        <td>
+                            Шрифт<br>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
                             <input id="wordCount" type="number" min="1" value="100" />
                         </td>
                         <td>
-                            <label for="fontSelect">Шрифт</label><br><br>
                             <select id="fontSelect">
                                 <option value="HachiMaruPop">HachiMaruPop</option>
                                 <option value="Pacifico">Pacifico</option>
@@ -42,14 +48,18 @@
                     </tr>
                     <tr>
                         <td>
-                            <label>Размер шрифта</label><br>
-                            <label for="minFontSize">От:</label>
-                            <input id="minFontSize" type="number" min="1" value="12" /><br>
-                            <label for="maxFontSize">До:</label>
-                            <input id="maxFontSize" type="number" min="1" value="72" />
+                            Размер шрифта<br>
+                            От:
                         </td>
                         <td>
-                            <label for="themeSelect">Тема</label><br><br>
+                            Тема<br>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input id="minFontSize" type="number" min="1" value="12" /><br>
+                        </td>
+                        <td>
                             <select id="themeSelect">
                                 <option value="white">Светлая</option>
                                 <option value="black">Темная</option>
@@ -59,7 +69,9 @@
 
                     <tr>
                         <td>
-                            <label for="colorSchemeSelect">Цветовая схема</label><br>
+                            До:
+                            <input id="maxFontSize" type="number" min="1" value="72" />
+                            Цветовая схема<br>
                             <select id="colorSchemeSelect">
                                 <option value="Reds">Красные</option>
                                 <option value="afmhot">Теплый</option>
@@ -82,6 +94,9 @@
                             </select>
                         </td>
                         <td>
+                            Контур
+                            <input type="checkbox" id="contour"/>
+                            <label for="contour">Toggle</label>
                         </td>
                     </tr>
                 </table>
@@ -104,6 +119,7 @@
             var colorScheme = document.getElementById("colorSchemeSelect").value;
             var font = document.getElementById("fontSelect").value;
             var wordCount = document.getElementById("wordCount").value;
+            var contour = document.getElementById("contour").checked;
 
             var params = {
                 text: text,
@@ -112,7 +128,8 @@
                 theme: theme,
                 colormap: colorScheme,
                 font_family: font,
-                max_words: Number(wordCount)
+                max_words: Number(wordCount),
+                contour: contour // Преобразуйте checkbox в булевое значениеontour: contour === "true" // Преобразуйте checkbox в булевое значениеontour: contour === "true" // Преобразуйте checkbox в булевое значение
             };
         
             console.log(params);
