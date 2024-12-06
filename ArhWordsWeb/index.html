@@ -92,14 +92,14 @@
                                 <option value="Overpass">Overpass</option>
                                 <!-- Добавьте другие шрифты по мере необходимости -->
                             </select>
+                            Контур
+                            <input type="checkbox" id="contour" hidden/>
+                            <label for="contour">Toggle</label>
                         </td>
                         <td>
-                            Контур
-                            <input type="checkbox" id="contour"/>
-                            <label for="contour">Toggle</label>
                             Тип маски
                             <div class="radio-group">
-                                <input type="radio" name="mask" value="mask_type1" />
+                                <input type="radio" name="mask" value="mask_type1"  checked/>
                                 <img src="icons/masks/mask_type1.png" alt="Маска 1" />
                                 Маска 1
                                 <input type="radio" name="mask" value="mask_type2" />
@@ -114,7 +114,8 @@
                     </tr>
                 </table>
 
-                <button id="createButton">Создать</button>
+                <button id="createButtonGpt" class="createButton">Сгенерировать с gpt</button>
+                <button id="createButton" class="createButton">Сгенерировать</button>
             </div>
             <div class="image-container">
                 <img alt="Облако слов" class="image-icon4" id="wordCloudImage" src="icons/bird.png" width="600"/>
@@ -125,7 +126,7 @@
   <script>
 
         // Обработчик для кнопки создания облака слов
-        document.getElementById("createButton").addEventListener("click", function () {
+        document.getElementById("createButtonGpt").addEventListener("click", function () {
             var text = document.getElementById("inputText").value;
             var theme = document.getElementById("themeSelect").value;
             var minFontSize = document.getElementById("minFontSize").value;
@@ -151,6 +152,54 @@
             console.log(params);
 
             fetch('http://127.0.0.1:3000/wordCloudGpt', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(params)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.blob(); // Измените на blob для получения изображения
+            })
+            .then(blob => {
+                const url = URL.createObjectURL(blob); // Создайте URL для blob
+                document.getElementById("wordCloudImage").src = url; // Установите src на URL
+                document.getElementById("wordCloudImage").style.display = "block"; // Покажите изображение
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        });
+
+        document.getElementById("createButton").addEventListener("click", function () {
+            var text = document.getElementById("inputText").value;
+            var theme = document.getElementById("themeSelect").value;
+            var minFontSize = document.getElementById("minFontSize").value;
+            var maxFontSize = document.getElementById("maxFontSize").value;
+            var colorScheme = document.getElementById("colorSchemeSelect").value;
+            var font = document.getElementById("fontSelect").value;
+            var wordCount = document.getElementById("wordCount").value;
+            var contour = document.getElementById("contour").checked;
+            var mask = document.querySelector('input[name="mask"]:checked').value;
+
+            var params = {
+                text: text,
+                min_font_size: Number(minFontSize),
+                max_font_size: Number(maxFontSize),
+                theme: theme,
+                colormap: colorScheme,
+                font_family: font,
+                max_words: Number(wordCount),
+                contour: contour, // Преобразуйте checkbox в булевое значениеontour: contour === "true" // Преобразуйте checkbox в булевое значениеontour: contour === "true" // Преобразуйте checkbox в булевое значение
+                mask_type: mask
+            };
+        
+            console.log(params);
+
+            fetch('http://127.0.0.1:3000/wordCloud', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
