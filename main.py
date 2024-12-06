@@ -18,6 +18,8 @@ from receiving_token import get_access_token
 app = Flask(__name__)
 CORS(app)
 
+env_path = "dev.env"
+
 # URL для обращения к GigaChat API
 GIGACHAT_API_URL = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
 AVAILABLE_COLORMAPS = [
@@ -135,7 +137,7 @@ def wordCloudGpt():
 
 
 def get_keywords(text):
-    access_token = get_access_token()
+    access_token = get_access_token(env_path)
     headers = {
         'Accept': 'application/json',
         'Authorization': f'Bearer {access_token}'  # Замените на ваш токен
