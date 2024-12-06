@@ -1,5 +1,9 @@
 import os
+import string
 from os import path
+
+from nltk.corpus import stopwords
+from sklearn.feature_extraction.text import TfidfVectorizer
 from wordcloud import WordCloud, STOPWORDS
 import numpy as np
 from PIL import Image
@@ -40,11 +44,8 @@ def preprocess_text(text):
     words = [word for word in words if word not in bad_words]
     return ' '.join(words)
 
-    return text
-  
-  
-@app.route('/wordCloud', methods=['POST'])
-def wordCloud():
+@app.route('/wordCloudGpt', methods=['POST'])
+def wordCloudGpt():
     # Загрузка стоп-слов NLTK
     nltk.download('stopwords', quiet=True)
 
@@ -72,7 +73,7 @@ def wordCloud():
     text = preprocess_text(text)
     # Получение ключевых слов и весов с помощью GigaChat API
     keywords_with_weights = get_keywords(text)
-    
+
     # Проверка, если keywords_with_weights пуст
     if not keywords_with_weights:
         return {"error": "No keywords returned from API"}, 500
@@ -91,27 +92,6 @@ def wordCloud():
     # Проверка, если weights пуст
     if not weights:
         return {"error": "No valid keywords found"}, 500
-      
-#     slovosochetaniya = " ".join(tm.get_slovosochetaniya(text))
-#     normal_text = tm.get_text_in_normal_form(text)
-#     text = slovosochetaniya + f" {normal_text}"
-#     text = preprocess_text(text)  # Предварительная обработка текста
-#     # Получение стоп-слов на русском языке
-#     russian_stopwords = set(stopwords.words('russian'))
-#     # Определение пользовательских стоп-слов
-#     custom_stopwords = set(STOPWORDS).union(russian_stopwords)
-
-#     # Преобразование пользовательских стоп-слов в список
-#     custom_stopwords_list = list(custom_stopwords)
-
-#     # Применение TF-IDF с учетом биграмм
-#     vectorizer = TfidfVectorizer(stop_words=custom_stopwords_list, ngram_range=(1, 2))
-#     tfidf_matrix = vectorizer.fit_transform([text])
-#     feature_names = vectorizer.get_feature_names_out()
-
-#     # Получение весов слов и словосочетаний
-#     weights = dict(zip(feature_names, tfidf_matrix.toarray()[0]))   
-
 
     # Получение директории данных
     d = path.dirname(__file__) if "__file__" in locals() else os.getcwd()
@@ -133,8 +113,8 @@ def wordCloud():
             max_font_size=max_font_size,
             relative_scaling=0,
             colormap=colormap,
-            contour_color= "white" if theme == "white" else "black",
-        ).generate_from_frequencies(weights) 
+            contour_color="white" if theme == "white" else "black",
+        ).generate_from_frequencies(weights)
     except Exception as e:
         return {"error": f"Error generating word cloud: {str(e)}"}, 500
 
@@ -144,12 +124,13 @@ def wordCloud():
 
     return send_file(img_io, mimetype='image/png')
 
+
 def get_keywords(text):
     headers = {
         'Accept': 'application/json',
         'Authorization': 'Bearer key'  # Замените на ваш токен
     }
-    
+
     payload = {
         "model": "GigaChat",
         "messages": [
@@ -169,13 +150,13 @@ def get_keywords(text):
     try:
         response = requests.post(GIGACHAT_API_URL, headers=headers, json=payload, verify='russian_trusted_root_ca.cer')
         response.raise_for_status()  # Проверяем на ошибки HTTP
-        
+
         # Логируем текст ответа
-        print("Response text:", response.text)  
-        
+        print("Response text:", response.text)
+
         keywords_data = response.json()
         print(keywords_data)  # Для отладки
-        
+
         # Проверяем, есть ли ключевые слова в ответе
         if 'choices' in keywords_data and len(keywords_data['choices']) > 0:
             keywords = keywords_data['choices'][0]['message']['content'].split(', ')
@@ -190,6 +171,79 @@ def get_keywords(text):
     except Exception as err:
         print(f"An error occurred: {err}")
         return ""
+
+@app.route('/wordCloud', methods=['POST'])
+def wordCloud():
+    # Загрузка стоп-слов NLTK
+    nltk.download('stopwords', quiet=True)
+
+    data = request.get_json()
+
+    if not data or 'text' not in data:
+        return {"error": "no text found in request"}, 400
+
+    # parameters for wordCloud
+    min_font_size = data.get('min_font_size', 4)
+    max_font_size = data.get('max_font_size', None)
+    max_words = data.get('max_words', 100)
+    theme = data.get('theme', "black")
+    colormap = data.get('colormap', None)
+
+    if colormap not in AVAILABLE_COLORMAPS and colormap is not None:
+        return {"error": f"Invalid colormap. Choose one of {AVAILABLE_COLORMAPS}"}, 400
+
+    if theme not in ["black", "white"]:
+        return {"error": "theme must be 'black' or 'white'"}, 400
+
+    # Чтение текста
+    text = data['text']
+    slovosochetaniya = " ".join(tm.get_slovosochetaniya(text))
+    normal_text = tm.get_text_in_normal_form(text)
+    text = slovosochetaniya + f" {normal_text}"
+    text = preprocess_text(text)  # Предварительная обработка текста
+    # Получение стоп-слов на русском языке
+    russian_stopwords = set(stopwords.words('russian'))
+    # Определение пользовательских стоп-слов
+    custom_stopwords = set(STOPWORDS).union(russian_stopwords)
+    # Преобразование пользовательских стоп-слов в список
+    custom_stopwords_list = list(custom_stopwords)
+    # Применение TF-IDF с учетом биграмм
+    vectorizer = TfidfVectorizer(stop_words=custom_stopwords_list, ngram_range=(1, 2))
+    tfidf_matrix = vectorizer.fit_transform([text])
+    feature_names = vectorizer.get_feature_names_out()
+    # Получение весов слов и словосочетаний
+    weights = dict(zip(feature_names, tfidf_matrix.toarray()[0]))
+
+    # Получение директории данных
+    d = path.dirname(__file__) if "__file__" in locals() else os.getcwd()
+
+    try:
+        mask_image = np.array(Image.open(path.join(d, 'mask.png')))
+    except Exception as e:
+        return {"error": f"Error loading mask image: {str(e)}"}, 500
+
+    try:
+        # Генерация изображения облака слов с маской и стоп-словами
+        wordcloud = WordCloud(
+            mask=mask_image,
+            background_color=theme,
+            contour_width=1,
+            stopwords=STOPWORDS,
+            max_words=max_words,
+            min_font_size=min_font_size,
+            max_font_size=max_font_size,
+            relative_scaling=0,
+            colormap=colormap,
+            contour_color="white" if theme == "white" else "black",
+        ).generate_from_frequencies(weights)
+    except Exception as e:
+        return {"error": f"Error generating word cloud: {str(e)}"}, 500
+
+    img_io = io.BytesIO()
+    wordcloud.to_image().save(img_io, format='PNG')
+    img_io.seek(0)
+
+    return send_file(img_io, mimetype='image/png')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000)
