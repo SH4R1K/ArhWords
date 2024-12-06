@@ -48,7 +48,7 @@
                             <input id="maxFontSize" type="number" min="1" value="72" />
                         </td>
                         <td>
-                            <label for="themeSelect">Шрифт</label><br>
+                            <label for="themeSelect">Тема</label><br>
                             <select id="themeSelect">
                                 <option value="white">Светлая</option>
                                 <option value="black">Темная</option>
@@ -102,13 +102,17 @@
             var minFontSize = document.getElementById("minFontSize").value;
             var maxFontSize = document.getElementById("maxFontSize").value;
             var colorScheme = document.getElementById("colorSchemeSelect").value;
+            var font = document.getElementById("fontSelect").value;
+            var wordCount = document.getElementById("wordCount").value;
 
             var params = {
                 text: text,
-                minFontSize: minFontSize,
-                maxFontSize: maxFontSize,
+                min_font_size: minFontSize,
+                max_font_size: maxFontSize,
                 theme: theme,
-                colorScheme: colorScheme
+                colormap: colorScheme,
+                font_family: font,
+                max_words: wordCount,
             };
 
             fetch('http://127.0.0.1:3000/wordCloudGpt', {
