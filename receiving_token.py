@@ -1,6 +1,14 @@
-import requests
+import os
 
-def get_access_token():
+import requests
+from dotenv import load_dotenv
+
+def get_access_token(env_path):
+    dotenv_path = env_path
+    load_dotenv(dotenv_path=dotenv_path)
+    if not os.path.exists(dotenv_path):
+        raise FileNotFoundError(f"Файл .env не найден по пути: {dotenv_path}")
+
     url = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth"
     payload = {
         'scope': 'GIGACHAT_API_PERS'
@@ -9,7 +17,7 @@ def get_access_token():
         'Content-Type': 'application/x-www-form-urlencoded',
         'Accept': 'application/json',
         'RqUID': '57372e62-86c7-4a21-962d-7b0e3376751b',
-        'Authorization': 'Basic key'  # Замените 'key' на ваш реальный ключ
+        'Authorization': f'Basic {os.getenv('API_KEY')}'  # Замените 'key' на ваш реальный ключ
     }
 
     # Отключение проверки SSL
