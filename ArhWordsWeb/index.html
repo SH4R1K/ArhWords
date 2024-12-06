@@ -1,62 +1,121 @@
-<!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1, width=device-width">
-    <link rel="stylesheet" href="./index.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Advent+Pro:wght@400;600;900&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" />
+    <meta charset="utf-8"/>
+    <meta content="initial-scale=1, width=device-width" name="viewport"/>
+    <link href="https://fonts.googleapis.com/css2?family=Advent+Pro:wght@400;600;900&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&amp;display=swap" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="index.css">
     <title>Создание облака слов</title>
 </head>
+
 <body>
-    <div class="site">
-        <div class="toolbar">
-            <div class="toolbar-item">
-                <img alt="Размер шрифта" class="image-icon" height="24" src="icons/image1.svg" width="24"/>
-                <span class="toolbar-text">
-                    Размер шрифта
-                </span>
+<header>
+    <div class="header-content">
+        <img src="icons/logo.svg" alt="Логотип" class="logo" />
+        <h1 class="header-title">ArhWords</h1>
+    </div>
+</header>
+<div class="site">
+    <div class="content">
+        <h1>Создание облака</h1>
+        <div class="textbox-container">
+            <div class="textbox">
+                <textarea id="inputText" placeholder="Введите текст..." rows="10"></textarea>
+                <table>
+                    <tr>
+                        <td>
+                            <label for="wordCount">Количество слов<br>До:</label>
+                            <input id="wordCount" type="number" min="1" value="100" />
+                        </td>
+                        <td>
+                            <label for="fontSelect">Шрифт</label><br>
+                            <select id="fontSelect">
+                                <option value="HachiMaruPop">HachiMaruPop</option>
+                                <option value="Pacifico">Pacifico</option>
+                                <option value="Lobster">Lobster</option>
+                                <option value="Comfortaa">Comfortaa</option>
+                                <option value="Overpass">Overpass</option>
+                                <!-- Добавьте другие шрифты по мере необходимости -->
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label>Размер шрифта</label><br>
+                            <label for="minFontSize">От:</label>
+                            <input id="minFontSize" type="number" min="1" value="12" /><br>
+                            <label for="maxFontSize">До:</label>
+                            <input id="maxFontSize" type="number" min="1" value="72" />
+                        </td>
+                        <td>
+                            <label for="themeSelect">Тема</label><br>
+                            <select id="themeSelect">
+                                <option value="white">Светлая</option>
+                                <option value="black">Темная</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <label for="colorSchemeSelect">Цветовая схема</label><br>
+                            <select id="colorSchemeSelect">
+                                <option value="Reds">Красные</option>
+                                <option value="afmhot">Теплый</option>
+                                <option value="Purples">Пурпурные</option>
+                                <option value="RdPu">Розовые</option>
+                                <option value="gnuplot">График</option>
+                                <option value="PRGn">Пурпурно-зеленый</option>
+                                <option value="Greens">Зеленые</option>
+                                <option value="Blues">Синие</option>
+                                <option value="RdBu">Красно-синие</option>
+                                <option value="Greys">Серые</option>
+                                <option value="cool">Прохладный</option>
+                                <option value="Dark2">Темный 2</option>
+                                <option value="brg">BRG</option>
+                                <option value="winter">Зима</option>
+                                <option value="spring">Весна</option>
+                                <option value="plasma">Плазма</option>
+                                <option value="magma">Магма</option>
+                                <option value="hot">Горячий</option>
+                            </select>
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+                </table>
+
+                <button id="createButton">Создать</button>
             </div>
-            <div class="toolbar-item">
-                <img alt="Цвет фона" class="image-icon" height="24" src="icons/Color.svg" width="24"/>
-                <span class="toolbar-text">
-                    Тема
-                </span>
-            </div>
-            <div class="toolbar-item">
-                <img alt="Цвет шрифта" class="image-icon" height="24" src="icons/image.svg" width="24"/>
-                <span class="toolbar-text">
-                    Цветовая схема
-                </span>
-            </div>
-        </div>
-        <div class="content">
-            <header>
-                <h1>
-                    Создание облака
-                </h1>
-            </header>
-            <div class="textbox-container">
-                <div class="textbox">
-                    <textarea id="inputText" placeholder="Введите текст..." rows="15"></textarea>
-                    <button id="createButton">
-                        Создать
-                    </button>
-                </div>
-                <div class="image-container">
-                    <img alt="Облако слов" class="image-icon4" height="400" id="wordCloudImage" src="icons/bird.png" width="400"/>
-                </div>
+            <div class="image-container">
+                <img alt="Облако слов" class="image-icon4" height="400" id="wordCloudImage" src="icons/bird.png" width="400"/>
             </div>
         </div>
     </div>
-
-    <script>
+</div>
+  <script>
+        // Обработчик для кнопки создания облака слов
         document.getElementById("createButton").addEventListener("click", function () {
             var text = document.getElementById("inputText").value;
+            var theme = document.getElementById("themeSelect").value;
+            var minFontSize = document.getElementById("minFontSize").value;
+            var maxFontSize = document.getElementById("maxFontSize").value;
+            var colorScheme = document.getElementById("colorSchemeSelect").value;
+            var font = document.getElementById("fontSelect").value;
+            var wordCount = document.getElementById("wordCount").value;
 
             var params = {
-                text: text
+                text: text,
+                min_font_size: Number(minFontSize),
+                max_font_size: Number(maxFontSize),
+                theme: theme,
+                colormap: colorScheme,
+                font_family: font,
+                max_words: Number(wordCount)
             };
+        
+            console.log(params);
 
             fetch('http://127.0.0.1:3000/wordCloudGpt', {
                 method: 'POST',
@@ -80,6 +139,6 @@
                 console.error('Error:', error);
             });
         });
-    </script>
-</body>
+  </script>
+ </body>
 </html>
