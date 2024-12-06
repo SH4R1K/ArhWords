@@ -12,8 +12,10 @@ from flask import Flask, send_file, request
 import text_module as tm
 import io
 import requests  # Импортируем библиотеку requests
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 # URL для обращения к GigaChat API
 GIGACHAT_API_URL = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
