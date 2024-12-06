@@ -21,7 +21,7 @@
         <h1>Создание облака</h1>
         <div class="textbox-container">
             <div class="textbox">
-                <textarea id="inputText" placeholder="Введите текст..." rows="10"></textarea>
+                <textarea id="inputText" placeholder="Введите текст..." rows="8"></textarea>
                 <table>
                     <tr>
                         <td>
@@ -116,6 +116,7 @@
 
                 <button id="createButtonGpt" class="createButton">Сгенерировать с gpt</button>
                 <button id="createButton" class="createButton">Сгенерировать</button>
+                <button id="downloadButton" class="createButton">Скачать картинку</button>
             </div>
             <div class="image-container">
                 <img alt="Облако слов" class="image-icon4" id="wordCloudImage" src="icons/bird.png" width="600"/>
@@ -124,6 +125,19 @@
     </div>
 </div>
   <script>
+        document.getElementById("downloadButton").addEventListener("click", function () {
+            const image = document.getElementById("wordCloudImage").src;
+            if (image) {
+                const link = document.createElement('a');
+                link.href = image;
+                link.download = 'word_cloud.png'; // Имя файла для скачивания
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                alert("Сначала сгенерируйте облако слов!");
+            }
+        });
 
         // Обработчик для кнопки создания облака слов
         document.getElementById("createButtonGpt").addEventListener("click", function () {
