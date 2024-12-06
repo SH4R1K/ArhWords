@@ -25,6 +25,10 @@ AVAILABLE_COLORMAPS = [
     "spring", "plasma", "magma", "hot"
 ]
 
+AVAILABLE_FONTS = {
+    "HachiMaruPop", "Pacifico", "Lobster", "Comfortaa", "Overpass"
+}
+
 # Чтение списка матерных слов из файла
 def load_bad_words(file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -61,6 +65,7 @@ def wordCloudGpt():
     max_words = data.get('max_words', 100)
     theme = data.get('theme', "black")
     colormap = data.get('colormap', None)
+    font_family = data.get('font_family', None)
 
     if colormap not in AVAILABLE_COLORMAPS and colormap is not None:
         return {"error": f"Invalid colormap. Choose one of {AVAILABLE_COLORMAPS}"}, 400
@@ -105,6 +110,7 @@ def wordCloudGpt():
     try:
         # Генерация изображения облака слов с маской и стоп-словами
         wordcloud = WordCloud(
+            font_path="./fonts/" + font_family + ".ttf" if font_family is not None else None,
             mask=mask_image,
             background_color=theme,
             contour_width=1,
@@ -190,9 +196,13 @@ def wordCloud():
     max_words = data.get('max_words', 100)
     theme = data.get('theme', "black")
     colormap = data.get('colormap', None)
+    font_family = data.get('font_family', None)
 
     if colormap not in AVAILABLE_COLORMAPS and colormap is not None:
         return {"error": f"Invalid colormap. Choose one of {AVAILABLE_COLORMAPS}"}, 400
+
+    if font_family not in AVAILABLE_FONTS and font_family is not None:
+        return {"error": f"Invalid font_family. Choose one of {AVAILABLE_FONTS}"}, 400
 
     if theme not in ["black", "white"]:
         return {"error": "theme must be 'black' or 'white'"}, 400
@@ -227,6 +237,7 @@ def wordCloud():
     try:
         # Генерация изображения облака слов с маской и стоп-словами
         wordcloud = WordCloud(
+            font_path="./fonts/" + font_family + ".ttf" if font_family is not None else None,
             mask=mask_image,
             background_color=theme,
             contour_width=1,
