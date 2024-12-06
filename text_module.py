@@ -29,7 +29,7 @@ def get_text_in_normal_form(text):
             massive += [p.normal_form.strip()]
     return " ".join(massive)
 
-text = open('constitution.txt', encoding="utf8").read()
+#text = open('constitution.txt', encoding="utf8").read()
 
 
 def find_childs(head_id, tokens):
@@ -50,7 +50,7 @@ def get_slovosochetaniya(text):
     syntax_parser = NewsSyntaxParser(emb)
 
     doc = Doc(text)
-
+    heads = []
     doc.segment(segmenter)
     doc.tag_morph(morph_tagger)
     doc.parse_syntax(syntax_parser)
@@ -58,7 +58,8 @@ def get_slovosochetaniya(text):
     for sent in doc.sents:
         syntax = sent.syntax
         for token in syntax.tokens:
-            if (token.rel == "amod"):
+            if ((token.rel) == "amod" and (token.head_id not in heads)):
+                heads += [token.head_id.strip()]
                 massive += [find_childs(token.head_id, syntax.tokens).strip()]
     return massive
 #print(get_slovosochetaniya(text))
