@@ -23,7 +23,7 @@ env_path = "dev.env"
 # URL для обращения к GigaChat API
 GIGACHAT_API_URL = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
 AVAILABLE_COLORMAPS = [
-    "Wisteria", "Reds", "afmhot", "Purples", "RdPu",
+    "Reds", "afmhot", "Purples", "RdPu",
     "gnuplot", "PRGn", "Greens", "Blues", "RdBu",
     "Greys", "cool", "Dark2", "brg", "winter",
     "spring", "plasma", "magma", "hot"
@@ -220,7 +220,7 @@ def wordCloud():
     # Получение стоп-слов на русском языке
     russian_stopwords = set(stopwords.words('russian'))
     # Определение пользовательских стоп-слов
-    custom_stopwords = set(STOPWORDS).union(russian_stopwords)
+    custom_stopwords = russian_stopwords
     # Преобразование пользовательских стоп-слов в список
     custom_stopwords_list = list(custom_stopwords)
     # Применение TF-IDF с учетом биграмм

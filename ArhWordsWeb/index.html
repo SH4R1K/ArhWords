@@ -31,10 +31,11 @@
                         <td>
                             <label for="fontSelect">Шрифт</label><br>
                             <select id="fontSelect">
-                                <option value="Advent Pro">Advent Pro</option>
-                                <option value="Inter">Inter</option>
-                                <option value="Arial">Arial</option>
-                                <option value="Times New Roman">Times New Roman</option>
+                                <option value="HachiMaruPop">HachiMaruPop</option>
+                                <option value="Pacifico">Pacifico</option>
+                                <option value="Lobster">Lobster</option>
+                                <option value="Comfortaa">Comfortaa</option>
+                                <option value="Overpass">Overpass</option>
                                 <!-- Добавьте другие шрифты по мере необходимости -->
                             </select>
                         </td>
@@ -60,7 +61,6 @@
                         <td>
                             <label for="colorSchemeSelect">Цветовая схема</label><br>
                             <select id="colorSchemeSelect">
-                                <option value="Wisteria">Вистерия</option>
                                 <option value="Reds">Красные</option>
                                 <option value="afmhot">Теплый</option>
                                 <option value="Purples">Пурпурные</option>
@@ -107,13 +107,15 @@
 
             var params = {
                 text: text,
-                min_font_size: minFontSize,
-                max_font_size: maxFontSize,
+                min_font_size: Number(minFontSize),
+                max_font_size: Number(maxFontSize),
                 theme: theme,
                 colormap: colorScheme,
                 font_family: font,
-                max_words: wordCount,
+                max_words: Number(wordCount)
             };
+        
+            console.log(params);
 
             fetch('http://127.0.0.1:3000/wordCloudGpt', {
                 method: 'POST',
