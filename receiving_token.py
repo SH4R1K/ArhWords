@@ -9,7 +9,7 @@ headers = {
     'Content-Type': 'application/x-www-form-urlencoded',
     'Accept': 'application/json',
     'RqUID': '57372e62-86c7-4a21-962d-7b0e3376751b',
-    'Authorization': 'Basic key'
+    'Authorization': 'Basic ZGQxYjgzNzktZjQ5OC00ZWNkLWExYTEtMmQyMzVhMzlkN2Q0OjgyMjM2OTA0LTQ4NjUtNDA5NC04YWMxLWE5ZjA4MmViZWEzNQ=='
 }
 
 # Отключение проверки SSL

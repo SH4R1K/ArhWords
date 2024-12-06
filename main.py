@@ -64,6 +64,7 @@ def wordCloudGpt():
     max_words = data.get('max_words', 100)
     theme = data.get('theme', "black")
     colormap = data.get('colormap', None)
+    font_family = data.get('font_family', None)
 
     if colormap not in AVAILABLE_COLORMAPS and colormap is not None:
         return {"error": f"Invalid colormap. Choose one of {AVAILABLE_COLORMAPS}"}, 400
@@ -108,6 +109,7 @@ def wordCloudGpt():
     try:
         # Генерация изображения облака слов с маской и стоп-словами
         wordcloud = WordCloud(
+            font_path="./fonts/" + font_family + ".ttf" if font_family is not None else None,
             mask=mask_image,
             background_color=theme,
             contour_width=1,
@@ -132,7 +134,7 @@ def wordCloudGpt():
 def get_keywords(text):
     headers = {
         'Accept': 'application/json',
-        'Authorization': 'Bearer key'  # Замените на ваш токен
+        'Authorization': 'Bearer eyJjdHkiOiJqd3QiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwiYWxnIjoiUlNBLU9BRVAtMjU2In0.sveBDijbCSEP7Wz2JvWws6aCOtrSAmLYQFPaljD4JYtApicwli2Zsrbp15ol9iXyYmuR2Jlj5pAYwm8j8MU_3x17vhRL5uwKArmi4jcCRY_CbAkNDN1ocFKOWYYcf_J81nWWVhMeO4rJwswnhSNxd4ku5N7lSqtKfBMl0NFusplL6MIz3NAxlQN8MqeLbFhriu54PTJ7N_aHjvhknQU5ZMoCLfHRO8QdVB8lpJxSRyDZW76HG5JGucm6jVNn763yFhujmRRqL2BrqM9i9ec3uzEhSqUunU3t_10dNQLYUF15XckKfRuqK27db1MZPigOn3vGKdk7t_Uv5geGv_X8AQ.9AFBg6LwOm1JpALaHSsjJQ.hoLt2SNa1Y8dVHjXaMTdEjRkfscYtwvNPZLYsIplcJQZ_ScfUOeD9wzHoVOxPRIuCwmbQgbA92MRQ_Iu3b2jJoJjKvaPeUDR4w0oimMdUUVfp4HnTwK4XJEDq7UwwHbP7vPqUi0CF6s3OZ9ZCbwJCxAs_6_Yx0h25difX20rKXnYBYUAijIgPhVfqm1MrODXFXXrV3I1u_cgXKMBPPVZ-WR5vIPNqAiX0lETDY3fd06cn1sBwMhbwyIM0BAbjVn7ag_QPgaymWF9AkaxYh76UEfOjfiD978hTU3gaY7cGvdqthfiDBQD7-FCP90Jm8zzGXnhzHoRDQ8LkEoIcxOuP3VuSA6AKUjMR1T9AjJocd1TZ9rT-ofLAhf4ahePlXRkVGPwg7tDOcjJ8fBuLlqbCr2S1TUb369vA8FavOBw15-LLraT5CJ82F5ICTKykbGhoF5dC-NmAhAOb3nT8C8_bY9UJbRdwxWiCtTHeq1vzWdah2JyZPMwN7rceQXbcVGGdweW9shXEbmILeeI2bocWBILALalC5EGm4ADpp5rrO835y4aQHg4hsmyKnDy0E-hxO83gfw6Kbho1flmkMo_7J9VAggZeTGusBCruFbTJbb1szJqznI3xWGyQLT0LaOE3LFs3HKYbCWvGoXQLYPf9MhAPrZ3nYNZE-QdqYZkN4ouW71KnvamDnEn-hFG5tNFoIhS6pc_wny7dWAy6LmOxTrCuvPbs_WxlTa9MJwfcQM.vpqbpJnHK9FaOkR8VMZOsSmK35gqZPj1vrx86EdQPpQ'  # Замените на ваш токен
     }
 
     payload = {
