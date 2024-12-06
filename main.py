@@ -10,6 +10,7 @@ from PIL import Image
 import nltk
 from flask import Flask, send_file, request
 import text_module as tm
+import parser_module as pm
 import io
 import requests  # Импортируем библиотеку requests
 from flask_cors import CORS
@@ -87,7 +88,10 @@ def wordCloudGpt():
         return {"error": f"Invalid mask_type. Choose one of {AVAILABLE_MASKS}"}, 400
 
     # Чтение текста
-    text = data['text']
+    if (len(data['text']) == 0):
+        text = pm.ParseSite()
+    else:
+        text = data['text']
 
     text = preprocess_text(text)
     # Получение ключевых слов и весов с помощью GigaChat API
@@ -228,7 +232,10 @@ def wordCloud():
         return {"error": f"Invalid mask_type. Choose one of {AVAILABLE_MASKS}"}, 400
 
     # Чтение текста
-    text = data['text']
+    if (len(data['text']) == 0):
+        text = pm.ParseSite()
+    else:
+        text = data['text']
     slovosochetaniya = " ".join(tm.get_slovosochetaniya(text))
     normal_text = tm.get_text_in_normal_form(text)
     text = slovosochetaniya + f" {normal_text}"
