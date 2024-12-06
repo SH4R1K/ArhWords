@@ -34,6 +34,10 @@ AVAILABLE_FONTS = {
     "HachiMaruPop", "Pacifico", "Lobster", "Comfortaa", "Overpass"
 }
 
+AVAILABLE_MASKS = {
+    "mask_type1", "mask_type2", "mask_type3",
+}
+
 # Чтение списка матерных слов из файла
 def load_bad_words(file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -72,12 +76,16 @@ def wordCloudGpt():
     contour = data.get('contour', False)
     colormap = data.get('colormap', None)
     font_family = data.get('font_family', None)
+    mask_type = data.get('mask_type', 'mask_type1')
 
     if colormap not in AVAILABLE_COLORMAPS and colormap is not None:
         return {"error": f"Invalid colormap. Choose one of {AVAILABLE_COLORMAPS}"}, 400
 
     if theme not in ["black", "white"]:
         return {"error": "theme must be 'black' or 'white'"}, 400
+
+    if mask_type not in AVAILABLE_MASKS and mask_type is not None:
+        return {"error": f"Invalid mask_type. Choose one of {AVAILABLE_MASKS}"}, 400
 
     # Чтение текста
     text = data['text']
@@ -109,7 +117,7 @@ def wordCloudGpt():
     d = path.dirname(__file__) if "__file__" in locals() else os.getcwd()
 
     try:
-        mask_image = np.array(Image.open(path.join(d, 'mask.png')))
+        mask_image = np.array(Image.open(path.join(d, "./masks/" + mask_type + ".png")))
     except Exception as e:
         return {"error": f"Error loading mask image: {str(e)}"}, 500
 
@@ -241,7 +249,7 @@ def wordCloud():
     d = path.dirname(__file__) if "__file__" in locals() else os.getcwd()
 
     try:
-        mask_image = np.array(Image.open(path.join(d, 'mask.png')))
+        mask_image = np.array(Image.open(path.join(d, 'mask_type1.png')))
     except Exception as e:
         return {"error": f"Error loading mask image: {str(e)}"}, 500
 
