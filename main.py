@@ -10,6 +10,7 @@ from PIL import Image
 import nltk
 from flask import Flask, send_file, request
 import text_module as tm
+import parser_module as pm
 import io
 import requests  # Импортируем библиотеку requests
 from flask_cors import CORS
@@ -23,7 +24,7 @@ env_path = "dev.env"
 # URL для обращения к GigaChat API
 GIGACHAT_API_URL = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
 AVAILABLE_COLORMAPS = [
-    "Wisteria", "Reds", "afmhot", "Purples", "RdPu",
+    "Reds", "afmhot", "Purples", "RdPu",
     "gnuplot", "PRGn", "Greens", "Blues", "RdBu",
     "Greys", "cool", "Dark2", "brg", "winter",
     "spring", "plasma", "magma", "hot"
@@ -31,6 +32,10 @@ AVAILABLE_COLORMAPS = [
 
 AVAILABLE_FONTS = {
     "HachiMaruPop", "Pacifico", "Lobster", "Comfortaa", "Overpass"
+}
+
+AVAILABLE_MASKS = {
+    "mask_type1", "mask_type2", "mask_type3",
 }
 
 # Чтение списка матерных слов из файла
@@ -68,8 +73,10 @@ def wordCloudGpt():
     max_font_size = data.get('max_font_size', None)
     max_words = data.get('max_words', 100)
     theme = data.get('theme', "black")
+    contour = data.get('contour', False)
     colormap = data.get('colormap', None)
     font_family = data.get('font_family', None)
+    mask_type = data.get('mask_type', 'mask_type1')
 
     if colormap not in AVAILABLE_COLORMAPS and colormap is not None:
         return {"error": f"Invalid colormap. Choose one of {AVAILABLE_COLORMAPS}"}, 400
@@ -77,8 +84,14 @@ def wordCloudGpt():
     if theme not in ["black", "white"]:
         return {"error": "theme must be 'black' or 'white'"}, 400
 
+    if mask_type not in AVAILABLE_MASKS and mask_type is not None:
+        return {"error": f"Invalid mask_type. Choose one of {AVAILABLE_MASKS}"}, 400
+
     # Чтение текста
-    text = data['text']
+    if (len(data['text']) == 0):
+        text = pm.ParseSite()
+    else:
+        text = data['text']
 
     text = preprocess_text(text)
     # Получение ключевых слов и весов с помощью GigaChat API
@@ -107,9 +120,14 @@ def wordCloudGpt():
     d = path.dirname(__file__) if "__file__" in locals() else os.getcwd()
 
     try:
-        mask_image = np.array(Image.open(path.join(d, 'mask.png')))
+        mask_image = np.array(Image.open(path.join(d, "./masks/" + mask_type + ".png")))
     except Exception as e:
         return {"error": f"Error loading mask image: {str(e)}"}, 500
+
+    if contour:
+        contour_color = "black" if theme == "white" else "white"
+    else:
+        contour_color = theme
 
     try:
         # Генерация изображения облака слов с маской и стоп-словами
@@ -124,7 +142,7 @@ def wordCloudGpt():
             max_font_size=max_font_size,
             relative_scaling=0,
             colormap=colormap,
-            contour_color="white" if theme == "white" else "black",
+            contour_color=contour_color,
         ).generate_from_frequencies(weights)
     except Exception as e:
         return {"error": f"Error generating word cloud: {str(e)}"}, 500
@@ -199,20 +217,25 @@ def wordCloud():
     max_font_size = data.get('max_font_size', None)
     max_words = data.get('max_words', 100)
     theme = data.get('theme', "black")
+    contour = data.get('contour', False)
     colormap = data.get('colormap', None)
     font_family = data.get('font_family', None)
+    mask_type = data.get('mask_type', 'mask_type1')
 
     if colormap not in AVAILABLE_COLORMAPS and colormap is not None:
         return {"error": f"Invalid colormap. Choose one of {AVAILABLE_COLORMAPS}"}, 400
 
-    if font_family not in AVAILABLE_FONTS and font_family is not None:
-        return {"error": f"Invalid font_family. Choose one of {AVAILABLE_FONTS}"}, 400
-
     if theme not in ["black", "white"]:
         return {"error": "theme must be 'black' or 'white'"}, 400
 
+    if mask_type not in AVAILABLE_MASKS and mask_type is not None:
+        return {"error": f"Invalid mask_type. Choose one of {AVAILABLE_MASKS}"}, 400
+
     # Чтение текста
-    text = data['text']
+    if (len(data['text']) == 0):
+        text = pm.ParseSite()
+    else:
+        text = data['text']
     slovosochetaniya = " ".join(tm.get_slovosochetaniya(text))
     normal_text = tm.get_text_in_normal_form(text)
     text = slovosochetaniya + f" {normal_text}"
@@ -220,7 +243,7 @@ def wordCloud():
     # Получение стоп-слов на русском языке
     russian_stopwords = set(stopwords.words('russian'))
     # Определение пользовательских стоп-слов
-    custom_stopwords = set(STOPWORDS).union(russian_stopwords)
+    custom_stopwords = russian_stopwords
     # Преобразование пользовательских стоп-слов в список
     custom_stopwords_list = list(custom_stopwords)
     # Применение TF-IDF с учетом биграмм
@@ -234,9 +257,14 @@ def wordCloud():
     d = path.dirname(__file__) if "__file__" in locals() else os.getcwd()
 
     try:
-        mask_image = np.array(Image.open(path.join(d, 'mask.png')))
+        mask_image = np.array(Image.open(path.join(d, "./masks/" + mask_type + ".png")))
     except Exception as e:
         return {"error": f"Error loading mask image: {str(e)}"}, 500
+
+    if contour:
+        contour_color = "black" if theme == "white" else "white"
+    else:
+        contour_color = theme
 
     try:
         # Генерация изображения облака слов с маской и стоп-словами
@@ -251,7 +279,7 @@ def wordCloud():
             max_font_size=max_font_size,
             relative_scaling=0,
             colormap=colormap,
-            contour_color="white" if theme == "white" else "black",
+            contour_color=contour_color,
         ).generate_from_frequencies(weights)
     except Exception as e:
         return {"error": f"Error generating word cloud: {str(e)}"}, 500

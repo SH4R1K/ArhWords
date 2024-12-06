@@ -1,0 +1,260 @@
+body {
+    margin: 0;
+    font-family: 'Advent Pro', sans-serif;
+    background-color: #f7f7f7;
+}
+
+.site {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 20px;
+}
+
+.content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.textbox-container {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.textbox {
+    margin-right: 20px;
+    width: 50%;
+}
+
+
+.image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    width: 50%;
+}
+
+.image-icon4 {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.image-placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    border: 2px dashed #e0e0e0;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.placeholder {
+    font-size: 18px;
+    color: #999;
+    text-align: center;
+    padding: 20px;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Центрирование содержимого */
+    width: 100%;
+    border-width: 6px, 6px, 6px, 6px;
+    border-style: solid;
+    border-color: rgba(62, 162, 239, 1);
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.logo {
+    height: 50px; /* Установите нужную высоту для логотипа */
+    margin-right: 20px; /* Отступ между логотипом и заголовком */
+    padding: 0.5%;
+}
+
+.header-title {
+    font-size: 30px; /* Размер шрифта для заголовка */
+    color: #333; /* Цвет текста заголовка */
+}
+
+h1{
+    font-family: Advent Pro;
+    font-size: 40px;
+    font-weight: 600;
+    text-align: left;
+    margin: 0%;
+}
+
+/* Стили для текстового поля */
+#inputText {
+    width: 100%;
+    height: 130px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 16px;
+    resize: none;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+#inputText:focus {
+    border-color: rgba(62, 162, 239, 1);
+    box-shadow: 0 0 5px rgba(62, 162, 239, 0.5);
+}
+
+/* Стили для input[type="number"] */
+input[type="number"] {
+    width: 100%;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input[type="number"]:focus {
+    border-color: rgba(62, 162, 239, 1);
+    box-shadow: 0 0 5px rgba(62, 162, 239, 0.5);
+}
+
+/* Стили для select */
+select {
+    width: 100%;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 16px;
+    background-color: #fff;
+    appearance: none; /* Убираем стандартный стиль */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"><polygon points="0,0 10,0 5,5" fill="%23662d91"/></svg>'); /* Стрелка вниз */
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+select:focus {
+    border-color: rgba(62, 162, 239, 1);
+    box-shadow: 0 0 5px rgba(62, 162, 239, 0.5);
+}
+
+/* Стили для кнопки */
+.createButton {
+    background: rgba(62, 162, 239, 1);
+    box-shadow: 0px 4px 6.7px rgba(0, 0, 0, 0.67);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 24px;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin: 5px 0;
+    transition: background 0.3s, transform 0.2s;
+    width: 100%;
+}
+
+.createButton:hover {
+    background: rgb(73, 169, 243);
+    transform: translateY(-2px);
+}
+
+.createButton:active {
+    transform: translateY(0);
+}
+
+tr td{
+    align-items: start;
+    vertical-align: top;
+    width: 10%;
+}
+
+tr {
+    font-size: 21px;
+    margin-bottom: 5px;
+}
+
+.switch{
+    height: 0;
+    width: 0;
+    visibility: hidden;
+  }
+  
+  label {
+    cursor: pointer;
+    text-indent: -9999px;
+    width: 50px;
+    height: 25px;
+    background: grey;
+    display: block;
+    border-radius: 50px;
+    position: relative;
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+  
+  label:after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 15px;
+    height: 15px;
+    background: #fff;
+    border-radius: 40px;
+    transition: 0.3s;
+  }
+  
+  input:checked + label {
+    background: rgba(62, 162, 239, 1);
+  }
+  
+  input:checked + label:after {
+    left: calc(100% - 5px);
+    transform: translateX(-100%);
+  }
+  
+  label:active:after {
+    width: 30px;
+  }
+
+  .custom-select {
+    position: relative;
+    display: inline-block;
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.radio-group label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin: 5px 0;
+}
+
+.radio-group input[type="radio"] {
+    margin-right: 10px; /* Отступ между радиокнопкой и текстом */
+}
+
+.radio-group img {
+    width: 20px; /* Установите нужную ширину */
+    height: 20px; /* Установите нужную высоту */
+    margin-right: 5px; /* Отступ между изображением и текстом */
+}
