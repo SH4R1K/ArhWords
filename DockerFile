@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . /app
 
 # Установка зависимостей
-RUN pip install —trusted-host pypi.python.org -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Открытие порта для взаимодействия с приложением
 EXPOSE 8080
