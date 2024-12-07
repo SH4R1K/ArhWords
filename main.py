@@ -8,7 +8,7 @@ from wordcloud import WordCloud, STOPWORDS
 import numpy as np
 from PIL import Image
 import nltk
-from flask import Flask, send_file, request
+from flask import Flask, send_file, request, render_template
 import text_module as tm
 import parser_module as pm
 import io
@@ -57,6 +57,11 @@ def preprocess_text(text):
     words = text.split()
     words = [word for word in words if word not in bad_words]
     return ' '.join(words)
+
+@app.route('/')
+@app.route('/index')
+def index():
+    return render_template("index.html")
 
 @app.route('/wordCloudGpt', methods=['POST'])
 def wordCloudGpt():

@@ -1,0 +1,29 @@
+services: 
+  arhwords_api:
+    container_name: arhwords_api
+    hostname: arhwords_api
+    restart: always
+    image: arhwords_api
+    ports:
+      - "7777:80"
+    build:
+      context: .
+      dockerfile: DockerFile
+    networks:
+      - backend
+  web_hehe:
+    container_name: web_hehe
+    hostname: web_hehe
+    restart: always
+    image: web_hehe
+    build:
+      context: .
+      dockerfile: DockerFile
+    networks:
+      - backend
+
+networks:
+  backend:
+    external: false
+    driver: bridge
+  
