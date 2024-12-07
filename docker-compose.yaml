@@ -17,7 +17,7 @@ services:
     restart: always
     image: web_hehe
     build:
-      context: .
+      context: ./ArhWordsWeb/.
       dockerfile: DockerFile
     networks:
       - backend
