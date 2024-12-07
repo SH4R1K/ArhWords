@@ -8,7 +8,7 @@ from wordcloud import WordCloud, STOPWORDS
 import numpy as np
 from PIL import Image
 import nltk
-from flask import Flask, send_file, request
+from flask import Flask, send_file, request, render_template
 import text_module as tm
 import parser_module as pm
 import io
@@ -289,6 +289,10 @@ def wordCloud():
     img_io.seek(0)
 
     return send_file(img_io, mimetype='image/png')
+
+@app.route('/', methods=['GET'])
+def root():
+    return render_template('index.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000)

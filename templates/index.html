@@ -5,14 +5,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Advent+Pro:wght@400;600;900&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&amp;display=swap" rel="stylesheet"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="{{url_for('static', filename='index.css')}}">
     <title>Создание облака слов</title>
 </head>
 
 <body>
 <header>
     <div class="header-content">
-        <img src="icons/logo.svg" alt="Логотип" class="logo" />
+        <img src="{{url_for('static', filename='logo.svg')}}" alt="Логотип" class="logo" />
         <h1 class="header-title">ArhWords</h1>
     </div>
 </header>
@@ -100,13 +100,13 @@
                             Тип маски
                             <div class="radio-group">
                                 <input type="radio" name="mask" value="mask_type1"  checked/>
-                                <img src="icons/masks/mask_type1.png" alt="Маска 1" />
+                                <img src="{{url_for('static', filename='mask_type1.png')}}" alt="Маска 1" />
                                 Маска 1
                                 <input type="radio" name="mask" value="mask_type2" />
-                                <img src="icons/masks/mask_type2.png" alt="Маска 2" />
+                                <img src="{{url_for('static', filename='mask_type2.png')}}" alt="Маска 2" />
                                 Маска 2
                                 <input type="radio" name="mask" value="mask_type3" />
-                                <img src="icons/masks/mask_type3.png" alt="Маска 3" />
+                                <img src="{{url_for('static', filename='mask_type3.png')}}" alt="Маска 3" />
                                 Маска 3
                             </div>
                             
@@ -119,7 +119,7 @@
                 <button id="downloadButton" class="createButton">Скачать картинку</button>
             </div>
             <div class="image-container">
-                <img alt="Облако слов" class="image-icon4" id="wordCloudImage" src="icons/bird.png" width="600"/>
+                <img alt="Облако слов" class="image-icon4" id="wordCloudImage" src="{{url_for('static', filename='bird.png')}}" width="600"/>
             </div>
         </div>
     </div>
