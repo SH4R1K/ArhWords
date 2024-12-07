@@ -4,8 +4,6 @@ services:
     hostname: arhwords_api
     restart: always
     image: arhwords_api
-    ports:
-      - "7777:80"
     build:
       context: .
       dockerfile: DockerFile
@@ -15,6 +13,8 @@ services:
     container_name: web_hehe
     hostname: web_hehe
     restart: always
+    ports:
+      - "7777:80"
     image: web_hehe
     build:
       context: ./ArhWordsWeb/.
